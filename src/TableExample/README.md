@@ -1,7 +1,7 @@
 ## React Table Example
 
 ### Current state
-![ReactTable](table.png?raw=true "Custom React Table")
+![table](https://user-images.githubusercontent.com/34630228/52600064-950e3900-2e41-11e9-9cb9-9da83848318d.png)
 
 ### TODOs
 * add freedom to styling
