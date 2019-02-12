@@ -82,7 +82,15 @@ function DataTable(props) {
 }
 
 DataTable.propTypes = {
-  classes: PropTypes.object.isRequired,
+  headStyle: PropTypes.object,
+  bodyStyle: PropTypes.object,
+  paperStyle: PropTypes.object,
+  rowStyle: PropTypes.object,
+  hover: PropTypes.bool,
+  square: PropTypes.bool,
+  alingHead: PropTypes.string,
+  alignRow: PropTypes.string,
+  tablePadding: PropTypes.string
 };
 
 DataTable.defaultProps = {

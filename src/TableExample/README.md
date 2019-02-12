@@ -6,3 +6,4 @@
 ### TODOs
 * [x] add freedom to styling
 * [ ] add option for ordering
+* [ ] set proper PropTypes (one of)
