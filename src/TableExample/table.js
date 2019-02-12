@@ -11,37 +11,39 @@ import Paper from '@material-ui/core/Paper';
 import { blue } from '@material-ui/core/colors';
 import { objByString } from './utils';
 
-const customBlue = blue[500];
-
-
-const CustomTableCell = withStyles(theme => ({
-  head: {
-    backgroundColor: customBlue,
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 13,
-  },
-}))(TableCell);
-
-const styles = theme => ({
-  root: {
-    width: '100%',
-    // marginTop: theme.spacing.unit * 3,
-    overflowX: 'auto',
-  },
-  table: {
-    minWidth: 700,
-  },
-  row: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.default,
-    },
-  },
-});
-
 function DataTable(props) {
-  const { classes, data, columns } = props;
+
+  const { data, columns } = props;
+
+  const CustomTableCell = withStyles(theme => ({
+    head: {
+      backgroundColor: blue[500],
+      color: "white",
+      fontSize: 13,
+      ...props.headStyle
+    },
+    body: {
+      fontSize: 13,
+      ...props.bodyStyle
+    },
+  }))(TableCell);
+
+  const CustomPaper = withStyles(theme => ({
+    root: {
+      width: '100%',
+      overflowX: 'auto',
+      ...props.paperStyle
+    },
+  }))(Paper);
+
+  const CustomTableRow = withStyles(theme => ({
+    row: {
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.background.default,
+      },
+      ...props.rowStyle
+    },
+  }))(TableRow);
 
   for (const col of columns) {
     if (!col.hasOwnProperty('cell')) col['cell'] = row => (
@@ -52,30 +54,30 @@ function DataTable(props) {
   }
 
   return (
-    <Paper className={classes.root} square>
-      <Table padding={'none'}>
+    <CustomPaper square={props.square}>
+      <Table padding={props.tablePadding}>
         <TableHead>
-          <TableRow hover className={classes.row}>
+          <CustomTableRow hover>
             {columns.map(col => (
-              <CustomTableCell key={col.name} align="center">
+              <CustomTableCell key={col.name} align={props.alingHead}>
                 {col.name}
               </CustomTableCell>
             ))}
-          </TableRow>
+          </CustomTableRow>
         </TableHead>
         <TableBody>
           {data.map((row, index) => (
-            <TableRow className={classes.row} key={index} hover>
+            <CustomTableRow key={index} hover={props.hover}>
               {columns.map((col, index) => (
-                <CustomTableCell key={index} align="center">
+                <CustomTableCell key={index} align={props.alignRow}>
                   {col.cell(row)}
                 </CustomTableCell>
               ))}
-            </TableRow>
+            </CustomTableRow>
           ))}
         </TableBody>
       </Table>
-    </Paper>
+    </CustomPaper>
   );
 }
 
@@ -83,4 +85,16 @@ DataTable.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(DataTable);
+DataTable.defaultProps = {
+  headStyle: {},
+  bodyStyle: {},
+  paperStyle: {},
+  rowStyle: {},
+  hover: true,
+  square: false,
+  alingHead: "center",
+  alignRow: "center",
+  tablePadding: "none",
+}
+
+export default DataTable;
