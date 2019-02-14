@@ -1,8 +1,10 @@
 ## React Table Example
 
 ### Current state
-![table](https://user-images.githubusercontent.com/34630228/52600064-950e3900-2e41-11e9-9cb9-9da83848318d.png)
+![table](https://user-images.githubusercontent.com/34630228/52824017-2da0f500-309e-11e9-811e-4790429fc9a7.png)
 
 ### TODOs
-* [ ] add freedom to styling
-* [ ] add option for ordering
+* [x] add freedom to styling
+* [x] add option for ordering
+* [ ] add pagination
+* [ ] set proper PropTypes (one of)
