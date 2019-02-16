@@ -16,13 +16,13 @@ export default function TableExample(props) {
     {
       name: "Age",
       selector: "age",
-      cell: row => <div>{row.age} years old</div>
+      cell: row => <div>{row.age} years old</div>,
     }
   ]
 
   return (
     <div style={{
-      width: "40%",
+      width: "60%",
       margin: "0 auto",
       padding: 50,
     }}>

@@ -12,6 +12,91 @@ import Tooltip from '@material-ui/core/Tooltip';
 
 import { blue, amber } from '@material-ui/core/colors';
 import { objByString } from './utils';
+import { TableFooter, TablePagination } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+
+// const actionsStyles = theme => ({
+//   root: {
+//     flexShrink: 0,
+//     color: theme.palette.text.secondary,
+//     marginLeft: theme.spacing.unit * 2.5,
+//   },
+// });
+
+class TablePaginationActions extends React.Component {
+  handleFirstPageButtonClick = () => {
+    this.props.onChangePage(0);
+  };
+
+  handleBackButtonClick = () => {
+    this.props.onChangePage(this.props.page - 1);
+  };
+
+  handleNextButtonClick = () => {
+    this.props.onChangePage(this.props.page + 1);
+  };
+
+  handleLastPageButtonClick = () => {
+    this.props.onChangePage(
+      Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1),
+    );
+  };
+
+  render() {
+    const { classes, count, page, rowsPerPage, theme } = this.props;
+
+    return (
+      <div className={classes.root}>
+        <IconButton
+          onClick={this.handleFirstPageButtonClick}
+          disabled={page === 0}
+          aria-label="First Page"
+        >
+          {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+        </IconButton>
+        <IconButton
+          onClick={this.handleBackButtonClick}
+          disabled={page === 0}
+          aria-label="Previous Page"
+        >
+          {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+        </IconButton>
+        <IconButton
+          onClick={this.handleNextButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="Next Page"
+        >
+          {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+        </IconButton>
+        <IconButton
+          onClick={this.handleLastPageButtonClick}
+          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+          aria-label="Last Page"
+        >
+          {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+        </IconButton>
+      </div>
+    );
+  }
+}
+
+TablePaginationActions.propTypes = {
+  classes: PropTypes.object.isRequired,
+  count: PropTypes.number.isRequired,
+  onChangePage: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+  theme: PropTypes.object.isRequired,
+};
+
+// const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
+//   TablePaginationActions,
+// );
+
 
 
 class DataTable extends React.Component {
@@ -26,6 +111,7 @@ class DataTable extends React.Component {
       },
       body: {
         fontSize: 13,
+        height: this.props.rowHeight,
         ...this.props.bodyStyle
       },
     }))(TableCell),
@@ -38,9 +124,6 @@ class DataTable extends React.Component {
     }))(Paper),
     CustomTableRow: withStyles(theme => ({
       root: {
-        // '&:nth-of-type(odd)': {
-        //   backgroundColor: theme.palette.background.default,
-        // },
         ...this.props.rowStyle
       },
     }))(TableRow),
@@ -58,7 +141,21 @@ class DataTable extends React.Component {
         color: amber[500],
         ...this.props.sortStyle
       }
-    }))(TableSortLabel)
+    }))(TableSortLabel),
+    TablePaginationActionsWrapped: withStyles(theme => ({
+      root: {
+        flexShrink: 0,
+        marginLeft: theme.spacing.unit * 2.5,
+        ...this.props.actionsStyle
+      },
+    }), { withTheme: true })(TablePaginationActions),
+    CustomTablePagination: withStyles(theme => ({
+      root: {
+        color: "black",
+        ...this.props.paginationStyle
+      }
+    }))(TablePagination)
+
   }
 
   
@@ -84,6 +181,8 @@ class DataTable extends React.Component {
     this.state = {
       order: 'desc',
       orderBy: 0,
+      page: 0,
+      rowsPerPage: 5
     }
 
   }
@@ -93,24 +192,41 @@ class DataTable extends React.Component {
     this.setState({ order: newOrder, orderBy: colName});
   }
 
-  sortData = (order, orderBy) => this.props.data.sort((a,b) => order === 'asc' 
+  sortData = (order, orderBy, page, rowsPerPage) => this.props.data
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .sort((a,b) => order === 'asc' 
       ? this.columns[orderBy].sorting(a,b)
       :-this.columns[orderBy].sorting(a, b))
   
+  onChangePage = page => {
+    this.setState({ page });
+  }
+
+  onChangeRowsPerPage = event => {
+    this.setState({ page: 0, rowsPerPage: event.target.value });
+  }
+
   render() {
+    const { CustomTableCell, CustomPaper, CustomTableRow, CustomTableSortLabel,
+      TablePaginationActionsWrapped, CustomTablePagination } = this.customs;
     const { props, columns } = this;
-    const { CustomTableCell, CustomPaper, CustomTableRow, CustomTableSortLabel } = this.customs;
-    const { order, orderBy } = this.state;
-    const sortedData = this.sortData(order, orderBy);
+    const { order, orderBy, page, rowsPerPage } = this.state;
+    const sortedData = this.sortData(order, orderBy, page, rowsPerPage);
+    const colSpan = Object.keys(sortedData[0]).length;
+    const emptyRows = rowsPerPage - Math.min(rowsPerPage, props.data.length - page * rowsPerPage);
     return (
       <CustomPaper square={props.square}>
         <Table padding={props.tablePadding}>
           <TableHead>
             <CustomTableRow hover>
-              {columns.map((col, index) => (
-                <CustomTableCell key={col.name} align={props.alingHead}>
+              {columns.map(({name, width}, index) => (
+                <CustomTableCell key={name} align={props.alingHead}
+                  style={{
+                    width: width ? width : `${100/colSpan}%`
+                  }}
+                >
                   <Tooltip
-                    title={`Sort by ${col.name}`}
+                    title={`Sort by ${name}`}
                     placement={'top-start'}
                     enterDelay={props.delay}
                   >
@@ -119,11 +235,12 @@ class DataTable extends React.Component {
                       direction={order}
                       onClick={() => this.onOrderByChange(order, index)}
                     >
-                      {col.name}
+                      {name}
                     </CustomTableSortLabel>
                   </Tooltip>
                 </CustomTableCell>
               ))}
+              
             </CustomTableRow>
           </TableHead>
           <TableBody>
@@ -136,7 +253,28 @@ class DataTable extends React.Component {
                 ))}
               </CustomTableRow>
             ))}
+            {emptyRows > 0 && (
+              <CustomTableRow style={{height: props.rowHeight * emptyRows + emptyRows - 2}}>
+                <CustomTableCell />
+              </CustomTableRow>
+            )}
           </TableBody>
+          <TableFooter>
+            <CustomTableRow>
+              <CustomTablePagination
+                rowsPerPageOptions={props.rowsPerPageOptions}
+                colSpan={colSpan}
+                count={props.data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={props.selectProps}
+                onChangePage={this.onChangePage}
+                labelRowsPerPage={props.labelRowsPerPage}
+                onChangeRowsPerPage={this.onChangeRowsPerPage}
+                ActionsComponent={TablePaginationActionsWrapped}
+              />
+            </CustomTableRow>
+          </TableFooter>
         </Table>
       </CustomPaper>
     );
@@ -161,11 +299,19 @@ DataTable.defaultProps = {
   paperStyle: {},
   rowStyle: {},
   sortStyle: {},
+  actionsStyle: {},
+  paginationStyle: {},
+  selectProps:{
+    native: false
+  },
   hover: true,
   square: false,
+  rowHeight: 50,
+  rowsPerPageOptions: [5, 10, 25],
   alingHead: "center",
   alignRow: "center",
   tablePadding: "none",
+  labelRowsPerPage: "Rows per page:",
   delay: 500
 }
 
