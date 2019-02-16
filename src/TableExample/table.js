@@ -19,14 +19,6 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 
-// const actionsStyles = theme => ({
-//   root: {
-//     flexShrink: 0,
-//     color: theme.palette.text.secondary,
-//     marginLeft: theme.spacing.unit * 2.5,
-//   },
-// });
-
 class TablePaginationActions extends React.Component {
   handleFirstPageButtonClick = () => {
     this.props.onChangePage(0);
@@ -92,12 +84,6 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
   theme: PropTypes.object.isRequired,
 };
-
-// const TablePaginationActionsWrapped = withStyles(actionsStyles, { withTheme: true })(
-//   TablePaginationActions,
-// );
-
-
 
 class DataTable extends React.Component {
 
