@@ -27,6 +27,7 @@ export default function TableExample(props) {
       padding: 50,
     }}>
       <Table
+        withCheckbox
         data={data}
         columns={cols}
       />

@@ -6,5 +6,6 @@
 ### TODOs
 * [x] add freedom to styling
 * [x] add option for ordering
-* [ ] add pagination
+* [x] add pagination
+* [ ] add checkbox option
 * [ ] set proper PropTypes (one of)
