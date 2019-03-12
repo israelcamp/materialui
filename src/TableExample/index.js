@@ -21,7 +21,6 @@ export default function TableExample(props) {
 
   const Chill = props => {
     const { selected } = props;
-    console.log(selected);
     return <div>I can be what I want</div>;
   };
 

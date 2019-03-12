@@ -1,58 +1,57 @@
-
 export const data = [
   {
-    name: "Kevin Malone",
+    name: 'Kevin Malone',
     age: 30,
-    job: "Accounting"
+    job: 'Accounting'
   },
   {
-    name: "Phyllis Vance, Vance Refrigeration",
+    name: 'Phyllis Vance, Vance Refrigeration',
     age: 50,
-    job: "Sales"
+    job: 'Sales'
   },
   {
-    name: "Ryan, The Fire Guy",
+    name: 'Ryan, The Fire Guy',
     age: 25,
-    job: "Temp"
+    job: 'Temp'
   },
   {
-    name: "Michael Scott",
+    name: 'Michael Scott',
     age: 44,
-    job: "Manager"
+    job: 'Manager'
   },
   {
-    name: "Pam Beasley",
+    name: 'Pam Beasley',
     age: 30,
-    job: "Sales"
+    job: 'Sales'
   },
   {
-    name: "Erin",
+    name: 'Erin',
     age: 25,
-    job: "Receptionist"
+    job: 'Receptionist'
   },
   {
-    name: "Jim Halper",
+    name: 'Jim Halper',
     age: 33,
-    job: "Sales"
+    job: 'Sales'
   },
   {
-    name: "Stanley",
+    name: 'Stanley',
     age: 50,
-    job: "Sales"
+    job: 'Sales'
   },
   {
-    name: "Creed Bratton",
+    name: 'Creed Bratton',
     age: 55,
-    job: "Quality assurance"
+    job: 'Quality assurance'
   },
   {
-    name: "Stanley",
+    name: 'Stanley',
     age: 50,
-    job: "Sales"
+    job: 'Sales'
   },
   {
-    name: "Creed Bratton",
+    name: 'Creed Bratton',
     age: 55,
-    job: "Quality assurance"
+    job: 'Quality assurance'
   }
-]
+];

@@ -1,17 +1,17 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import TableExample from './TableExample'
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import TableExample from './TableExample';
+import Uploader from './UploaderPreview';
 
-class App extends Component {
-  render() {
-    return (
-      <Router>
-        <Switch>
-          <Route exact path='/table' component={TableExample} /> 
-        </Switch> 
-      </Router>
-    );
-  }
+function App(props) {
+  return (
+    <Router>
+      <Switch>
+        <Route exact path="/table" component={TableExample} />
+        <Route exact path="/uploader" component={Uploader} />
+      </Switch>
+    </Router>
+  );
 }
 
 export default App;
