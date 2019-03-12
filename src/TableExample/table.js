@@ -1,3 +1,7 @@
+/* eslint-disable react/default-props-match-prop-types */
+/* eslint-disable react/prop-types */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,89 +13,17 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Tooltip from '@material-ui/core/Tooltip';
-
 import { blue, amber } from '@material-ui/core/colors';
-import { objByString } from './utils';
 import { TableFooter, TablePagination, Checkbox } from '@material-ui/core';
-import IconButton from '@material-ui/core/IconButton';
-import FirstPageIcon from '@material-ui/icons/FirstPage';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import LastPageIcon from '@material-ui/icons/LastPage';
-
-class TablePaginationActions extends React.Component {
-  handleFirstPageButtonClick = () => {
-    this.props.onChangePage(0);
-  };
-
-  handleBackButtonClick = () => {
-    this.props.onChangePage(this.props.page - 1);
-  };
-
-  handleNextButtonClick = () => {
-    this.props.onChangePage(this.props.page + 1);
-  };
-
-  handleLastPageButtonClick = () => {
-    this.props.onChangePage(
-      Math.max(0, Math.ceil(this.props.count / this.props.rowsPerPage) - 1),
-    );
-  };
-
-  render() {
-    const { classes, count, page, rowsPerPage, theme } = this.props;
-
-    return (
-      <div className={classes.root}>
-        <IconButton
-          onClick={this.handleFirstPageButtonClick}
-          disabled={page === 0}
-          aria-label="First Page"
-        >
-          {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleBackButtonClick}
-          disabled={page === 0}
-          aria-label="Previous Page"
-        >
-          {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleNextButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Next Page"
-        >
-          {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-        </IconButton>
-        <IconButton
-          onClick={this.handleLastPageButtonClick}
-          disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-          aria-label="Last Page"
-        >
-          {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
-        </IconButton>
-      </div>
-    );
-  }
-}
-
-TablePaginationActions.propTypes = {
-  classes: PropTypes.object.isRequired,
-  count: PropTypes.number.isRequired,
-  onChangePage: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-  theme: PropTypes.object.isRequired,
-};
+import TablePaginationActions from './table-pagination';
+import objByString from './utils';
 
 class DataTable extends React.Component {
-
   customs = {
     CustomTableCell: withStyles(theme => ({
       head: {
         backgroundColor: blue[500],
-        color: "white",
+        color: 'white',
         fontSize: 13,
         ...this.props.headStyle
       },
@@ -99,24 +31,24 @@ class DataTable extends React.Component {
         fontSize: 13,
         height: this.props.rowHeight,
         ...this.props.bodyStyle
-      },
+      }
     }))(TableCell),
     CustomPaper: withStyles(theme => ({
       root: {
         width: '100%',
         overflowX: 'auto',
         ...this.props.paperStyle
-      },
+      }
     }))(Paper),
     CustomTableRow: withStyles(theme => ({
       root: {
         ...this.props.rowStyle
-      },
+      }
     }))(TableRow),
     CustomTableSortLabel: withStyles(theme => ({
       root: {
         '&:hover': {
-          color: amber[500],
+          color: amber[500]
         },
         '&:focus': {
           color: amber[500]
@@ -128,111 +60,126 @@ class DataTable extends React.Component {
         ...this.props.sortStyle
       }
     }))(TableSortLabel),
-    TablePaginationActionsWrapped: withStyles(theme => ({
-      root: {
-        flexShrink: 0,
-        marginLeft: theme.spacing.unit * 2.5,
-        ...this.props.actionsStyle
-      },
-    }), { withTheme: true })(TablePaginationActions),
+    TablePaginationActionsWrapped: withStyles(
+      theme => ({
+        root: {
+          flexShrink: 0,
+          marginLeft: theme.spacing.unit * 2.5,
+          ...this.props.actionsStyle
+        }
+      }),
+      { withTheme: true }
+    )(TablePaginationActions),
     CustomTablePagination: withStyles(theme => ({
       root: {
-        color: "black",
+        color: 'black',
         ...this.props.paginationStyle
       }
     }))(TablePagination),
     CustomCheckbox: withStyles(theme => ({
       root: {
-        color: "#000",
+        color: '#000',
         '&$checked': {
-          color: blue[500],
+          color: blue[500]
         },
         ...this.props.rowCheckboxStyle
       },
-      checked: {},
+      checked: {}
     }))(Checkbox),
     CustomHeaderCheckbox: withStyles(theme => ({
       root: {
-        color: "#FFF",
+        color: '#FFF',
         '&$checked': {
-          color: "#FFF",
+          color: '#FFF'
         },
         ...this.props.headCheckboxStyle
       },
-      checked: {},
+      checked: {}
     }))(Checkbox)
-  }
+  };
 
-  
+  state = {
+    order: 'desc',
+    orderBy: 0,
+    page: 0,
+    rowsPerPage: 5,
+    selected: [],
+    headerSelected: false
+  };
+
   constructor(props) {
     super(props);
     const { columns } = props;
     for (const col of columns) {
-      if (!col.hasOwnProperty('cell')) col['cell'] = row => (
-        <div>
-          {objByString(row, col.selector)}
-        </div>
-      );
-      if (!col.hasOwnProperty('sorting')) col['sorting'] = (a, b) => {
-        const aa = objByString(a, col.selector);
-        const bb = objByString(b, col.selector);
-        if (aa < bb) return  1;
-        if (aa > bb) return -1;
-        return 0;
-      }
+      if (!col.hasOwnProperty('cell'))
+        col['cell'] = row => <div>{objByString(row, col.selector)}</div>;
+      if (!col.hasOwnProperty('sorting'))
+        col['sorting'] = (a, b) => {
+          const aa = objByString(a, col.selector);
+          const bb = objByString(b, col.selector);
+          if (aa < bb) return 1;
+          if (aa > bb) return -1;
+          return 0;
+        };
     }
     this.columns = columns;
-
-    this.state = {
-      order: 'desc',
-      orderBy: 0,
-      page: 0,
-      rowsPerPage: 5,
-      data: this.props.data,
-      selected: [],
-      headerSelected: false
-    }
-
   }
 
   onOrderByChange = (order, colName) => {
-    const newOrder = (order === 'desc' && colName === this.state.orderBy) ? 'asc' : 'desc';
-    this.setState({ order: newOrder, orderBy: colName});
-  }
+    const newOrder = order === 'desc' && colName === this.state.orderBy ? 'asc' : 'desc';
+    this.setState({ order: newOrder, orderBy: colName });
+  };
 
-  sortData = (order, orderBy, page, rowsPerPage) => this.state.data
+  sortData = (order, orderBy, page, rowsPerPage) =>
+    this.props.data
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      .sort((a,b) => order === 'asc' 
-      ? this.columns[orderBy].sorting(a,b)
-      :-this.columns[orderBy].sorting(a, b))
-  
+      .sort((a, b) =>
+        order === 'asc' ? this.columns[orderBy].sorting(a, b) : -this.columns[orderBy].sorting(a, b)
+      );
+
   onChangePage = page => {
     this.setState({ page });
-  }
+  };
 
   onChangeRowsPerPage = event => {
     this.setState({ page: 0, rowsPerPage: event.target.value });
-  }
+  };
 
   onRowCheckboxChange = name => {
     const { selected } = this.state;
     selected.includes(name)
-      ? this.setState({ selected: selected.filter(value => value !== name)})
-      : this.setState({ selected: [...selected, name]})
-  }
+      ? this.setState({ selected: selected.filter(value => value !== name) })
+      : this.setState({ selected: [...selected, name] });
+  };
 
   onHeaderCheckboxChange = () => {
-    const { headerSelected, data } = this.state;
+    const { headerSelected } = this.state;
+    const { data } = this.props;
     headerSelected
       ? this.setState({ selected: [], headerSelected: !headerSelected })
-      : this.setState({ selected: data.map(({name}) => name), headerSelected: !headerSelected})
-  }
+      : this.setState({ selected: data.map(({ name }) => name), headerSelected: !headerSelected });
+  };
+
+  selectedData = () => {
+    const { selected } = this.state;
+    const { data } = this.props;
+    return data.filter(({ name }) => selected.includes(name));
+  };
 
   render() {
-    const { CustomTableCell, CustomPaper, CustomTableRow, CustomTableSortLabel,
-      TablePaginationActionsWrapped, CustomTablePagination, CustomCheckbox, CustomHeaderCheckbox } = this.customs;
+    const {
+      CustomTableCell,
+      CustomPaper,
+      CustomTableRow,
+      CustomTableSortLabel,
+      TablePaginationActionsWrapped,
+      CustomTablePagination,
+      CustomCheckbox,
+      CustomHeaderCheckbox
+    } = this.customs;
     const { props, columns } = this;
-    const { order, orderBy, page, rowsPerPage, data, selected, headerSelected } = this.state;
+    const { data } = this.props;
+    const { order, orderBy, page, rowsPerPage, selected, headerSelected } = this.state;
     const sortedData = this.sortData(order, orderBy, page, rowsPerPage);
     const colSpan = Object.keys(sortedData[0]).length;
     const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
@@ -241,26 +188,26 @@ class DataTable extends React.Component {
         <Table padding={props.tablePadding}>
           <TableHead>
             <CustomTableRow>
-              {props.withCheckbox && 
+              {props.withCheckbox && (
                 <CustomTableCell padding="checkbox">
                   <CustomHeaderCheckbox
-                    indeterminate={headerSelected && selected.length < data.length && selected.length > 0}
+                    indeterminate={
+                      headerSelected && selected.length < data.length && selected.length > 0
+                    }
                     checked={headerSelected}
                     onChange={this.onHeaderCheckboxChange}
                   />
                 </CustomTableCell>
-              }
-              {columns.map(({name, width}, index) => (
-                <CustomTableCell key={name} align={props.alingHead}
+              )}
+              {columns.map(({ name, width }, index) => (
+                <CustomTableCell
+                  key={name}
+                  align={props.alingHead}
                   style={{
-                    width: width ? width : `${100/colSpan}%`
+                    width: width ? width : `${100 / colSpan}%`
                   }}
                 >
-                  <Tooltip
-                    title={`Sort by ${name}`}
-                    placement={'top-start'}
-                    enterDelay={props.delay}
-                  >
+                  <Tooltip title={`Sort by ${name}`} placement="top-start" enterDelay={props.delay}>
                     <CustomTableSortLabel
                       active={index === orderBy}
                       direction={order}
@@ -271,21 +218,20 @@ class DataTable extends React.Component {
                   </Tooltip>
                 </CustomTableCell>
               ))}
-              
             </CustomTableRow>
           </TableHead>
           <TableBody>
             {sortedData.map((row, index) => (
               <CustomTableRow key={index} hover={props.hover}>
-                {props.withCheckbox &&
+                {props.withCheckbox && (
                   <CustomTableCell padding="checkbox">
                     <CustomCheckbox
-                    // indeterminate={numSelected > 0 && numSelected < rowCount}
-                    checked={selected.includes(row.name)}
-                    onChange={() => this.onRowCheckboxChange(row.name)}
+                      // indeterminate={numSelected > 0 && numSelected < rowCount}
+                      checked={selected.includes(row.name)}
+                      onChange={() => this.onRowCheckboxChange(row.name)}
                     />
                   </CustomTableCell>
-                }
+                )}
                 {columns.map((col, index) => (
                   <CustomTableCell key={index} align={props.alignRow}>
                     {col.cell(row)}
@@ -294,7 +240,7 @@ class DataTable extends React.Component {
               </CustomTableRow>
             ))}
             {emptyRows > 0 && (
-              <CustomTableRow style={{height: props.rowHeight * emptyRows + emptyRows - 2}}>
+              <CustomTableRow style={{ height: props.rowHeight * emptyRows + emptyRows - 2 }}>
                 <CustomTableCell colSpan={colSpan + 1 * props.withCheckbox} />
               </CustomTableRow>
             )}
@@ -313,6 +259,7 @@ class DataTable extends React.Component {
                 onChangeRowsPerPage={this.onChangeRowsPerPage}
                 ActionsComponent={TablePaginationActionsWrapped}
               />
+              {React.cloneElement(props.children, { selected: this.selectedData() })}
             </CustomTableRow>
           </TableFooter>
         </Table>
@@ -343,18 +290,18 @@ DataTable.defaultProps = {
   paginationStyle: {},
   rowCheckboxStyle: {},
   headCheckboxStyle: {},
-  selectProps:{
+  selectProps: {
     native: false
   },
   hover: true,
   square: false,
   rowHeight: 50,
   rowsPerPageOptions: [5, 10, 25],
-  alingHead: "center",
-  alignRow: "center",
-  tablePadding: "none",
-  labelRowsPerPage: "Rows per page:",
+  alingHead: 'center',
+  alignRow: 'center',
+  tablePadding: 'none',
+  labelRowsPerPage: 'Rows per page:',
   delay: 500
-}
+};
 
 export default DataTable;
